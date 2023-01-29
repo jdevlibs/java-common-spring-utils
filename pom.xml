@@ -52,7 +52,7 @@
         <spring.version>5.3.25</spring.version>
         <spring-data.version>2022.0.0</spring-data.version>
         <slf4j.version>2.0.0</slf4j.version>
-        <common-utilities.version>1.2</common-utilities.version>
+        <common-utilities.version>1.0.0</common-utilities.version>
 
         <maven-javadoc-plugin.version>3.4.0</maven-javadoc-plugin.version>
         <maven-source-plugin.version>3.2.0</maven-source-plugin.version>
@@ -88,7 +88,7 @@
         </dependency>
 
         <dependency>
-            <groupId>th.co.cana.framework</groupId>
+            <groupId>io.github.jdevlibs</groupId>
             <artifactId>common-utilities</artifactId>
             <version>${common-utilities.version}</version>
             <scope>provided</scope>
