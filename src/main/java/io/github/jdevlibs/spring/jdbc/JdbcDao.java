@@ -363,18 +363,6 @@ public abstract class JdbcDao implements InitializingBean {
         }
     }
 
-    /**
-     * Setting for MySQL Server paging style
-     * @param sql The sql statement
-     * @param params The sql statement parameter
-     * @see IndexParameter
-     * @see NameParameter
-     * @param paging Sql paging criteria
-     */
-    public void setMySqlPaging(StringBuilder sql, Parameter params, Criteria paging) {
-        //TODO : wait for implement
-    }
-
     private void setOrderByOption(StringBuilder sql, Criteria paging) {
         if (paging.isEmptySort()) {
             return;
