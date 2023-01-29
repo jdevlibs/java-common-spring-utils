@@ -3,7 +3,7 @@
  * Copyright (c) 2023. Cana Enterprise Co., Ltd. All rights reserved
  * ---------------------------------------------------------------------------
  */
-package th.co.cana.framework.spring;
+package io.github.jdevlibs.spring;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

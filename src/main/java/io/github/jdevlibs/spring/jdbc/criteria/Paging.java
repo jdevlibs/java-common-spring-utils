@@ -3,7 +3,7 @@
  * Copyright (c) 2023. Cana Enterprise Co., Ltd. All rights reserved
  * ---------------------------------------------------------------------------
  */
-package th.co.cana.framework.jdbc.criteria;
+package io.github.jdevlibs.spring.jdbc.criteria;
 
 import java.io.Serializable;
 import java.util.ArrayList;

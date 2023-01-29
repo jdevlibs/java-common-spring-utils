@@ -3,8 +3,10 @@
  * Copyright (c) 2023. Cana Enterprise Co., Ltd. All rights reserved
  * ---------------------------------------------------------------------------
  */
-package th.co.cana.framework.jdbc;
+package io.github.jdevlibs.spring.jdbc;
 
+import io.github.jdevlibs.spring.Transformers;
+import io.github.jdevlibs.spring.jdbc.criteria.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -12,8 +14,6 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
-import th.co.cana.framework.jdbc.criteria.*;
-import th.co.cana.framework.spring.Transformers;
 import th.co.cana.framework.utils.JdbcUtils;
 import th.co.cana.framework.utils.Validators;
 import th.co.cana.framework.utils.Values;
