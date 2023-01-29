@@ -1,2 +1,2 @@
-# java-common-spring-utils
-Common utilities library for Spring framework
+# Spring framework utilities
+The utilities of spring framework library
