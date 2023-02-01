@@ -66,6 +66,20 @@ public final class SpringUtils {
     }
 
     /**
+     * Returns the value of the specified request header as a String. If the request did not include return null
+     * @param name The specifying the header name
+     * @return a value pf header name.
+     */
+    public static String getHeader(String name) {
+        ServletRequestAttributes requestAttributes = getServletRequestAttributes();
+        if (requestAttributes == null) {
+            return null;
+        }
+
+        return requestAttributes.getRequest().getHeader(name);
+    }
+
+    /**
      * Get current Authorization token (remove 'Bearer' prefix when exists)
      * <pre>
      *     1. get value from header "Authorization" example : Authorization: Bearer xyz-token
