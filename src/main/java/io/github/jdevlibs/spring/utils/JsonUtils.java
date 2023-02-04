@@ -19,7 +19,6 @@
 package io.github.jdevlibs.spring.utils;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.json.JsonWriteFeature;
@@ -33,12 +32,12 @@ import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import com.fasterxml.jackson.databind.type.CollectionType;
 import com.fasterxml.jackson.databind.type.MapType;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import io.github.jdevlibs.spring.ConfigProperties;
 import io.github.jdevlibs.utils.Validators;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.io.Serial;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -47,7 +46,6 @@ import java.util.*;
  * @version 1.0
  */
 public final class JsonUtils {
-    public static final String FORMAT_DT = "yyyy-MM-dd'T'HH:mm:ss";
     private static final JsonMapper mapper;
     private static final JsonMapper mapperJs;
     private static final Logger logger = LoggerFactory.getLogger(JsonUtils.class);
@@ -345,9 +343,8 @@ public final class JsonUtils {
     }
 
     private static void mapperConfig(JsonMapper mapper, boolean jsMode) {
-        mapper.setSerializationInclusion(Include.NON_EMPTY);
         mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        mapper.setDateFormat(new SimpleDateFormat(FORMAT_DT));
+        mapper.setDateFormat(new SimpleDateFormat(ConfigProperties.getJsonDateFormat()));
         mapper.registerModule(new JavaTimeModule());
         if (jsMode) {
             mapper.registerModule(createEnumModule());
@@ -365,8 +362,7 @@ public final class JsonUtils {
 
     private static SimpleModule createEnumModule() {
         SimpleModule module = new SimpleModule();
-        module.addSerializer(String.class, new StdSerializer<>(String.class) {
-            @Serial
+        module.addSerializer(String.class, new StdSerializer<String>(String.class) {
             private static final long serialVersionUID = 1L;
 
             @Override
@@ -383,8 +379,7 @@ public final class JsonUtils {
             }
         });
 
-        module.addSerializer(Enum.class, new StdSerializer<>(Enum.class) {
-            @Serial
+        module.addSerializer(Enum.class, new StdSerializer<Enum>(Enum.class) {
             private static final long serialVersionUID = 1L;
 
             @Override

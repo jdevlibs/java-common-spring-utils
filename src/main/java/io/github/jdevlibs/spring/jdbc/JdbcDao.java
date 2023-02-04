@@ -35,7 +35,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -656,10 +655,6 @@ public abstract class JdbcDao implements InitializingBean {
         }
 
         return sql.toString();
-    }
-
-    private void setDateParameter(NameParameter params, String name, Date value) {
-        params.add(name, value, ParamTypes.DATE);
     }
 
     private Object[] toArrays(Parameter params) {
