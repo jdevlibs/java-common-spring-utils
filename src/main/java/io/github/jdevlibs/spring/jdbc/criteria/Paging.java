@@ -27,43 +27,12 @@ import java.util.List;
 public class Paging<T> implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private Integer totalRow;
-    private int totalPage;
-    private int pageNo;
-    private int pageSize;
     private List<T> items;
-
-    public Integer getTotalRow() {
-        return totalRow;
-    }
-
-    public void setTotalRow(Integer totalRow) {
-        this.totalRow = totalRow;
-    }
-
-    public int getTotalPage() {
-        return totalPage;
-    }
-
-    public void setTotalPage(int totalPage) {
-        this.totalPage = totalPage;
-    }
-
-    public int getPageNo() {
-        return pageNo;
-    }
-
-    public void setPageNo(int pageNo) {
-        this.pageNo = pageNo;
-    }
-
-    public int getPageSize() {
-        return pageSize;
-    }
-
-    public void setPageSize(int pageSize) {
-        this.pageSize = pageSize;
-    }
+    private long totalElements;
+    private int totalPages;
+    private boolean last;
+    private boolean first;
+    private Criteria criteria;
 
     public List<T> getItems() {
         return items;
@@ -73,18 +42,57 @@ public class Paging<T> implements Serializable {
         this.items = items;
     }
 
-    public int getItemSize() {
-        return (items != null ? items.size() : 0);
+    public long getTotalElements() {
+        return totalElements;
     }
 
-    public void caculateTotalPage() {
-        if (totalRow == null || totalRow == 0 || pageSize == 0) {
+    public void setTotalElements(long totalElements) {
+        this.totalElements = totalElements;
+    }
+
+    public int getTotalPages() {
+        return totalPages;
+    }
+
+    public void setTotalPages(int totalPages) {
+        this.totalPages = totalPages;
+    }
+
+    public boolean isLast() {
+        return last;
+    }
+
+    public void setLast(boolean last) {
+        this.last = last;
+    }
+
+    public boolean isFirst() {
+        return first;
+    }
+
+    public void setFirst(boolean first) {
+        this.first = first;
+    }
+
+    public Criteria getCriteria() {
+        return criteria;
+    }
+
+    public void setCriteria(Criteria criteria) {
+        this.criteria = criteria;
+    }
+
+    public void calculateTotalPage() {
+        if (totalElements == 0 || criteria == null) {
+            first = true;
+            totalPages = 0;
             return;
         }
 
-        totalPage = totalRow / pageSize;
-        if (totalRow % pageSize != 0) {
-            totalPage += 1;
+        if (criteria.getSize() != null && criteria.getPage() != null) {
+            totalPages = (int) Math.ceil((double) this.totalElements / (double) criteria.getSize());
+            first = (criteria.getPage() == 1);
+            last = (criteria.getPage() >= totalPages);
         }
     }
 

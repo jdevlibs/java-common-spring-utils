@@ -20,7 +20,6 @@ import io.github.jdevlibs.spring.Transformers;
 import io.github.jdevlibs.spring.jdbc.criteria.*;
 import io.github.jdevlibs.utils.JdbcUtils;
 import io.github.jdevlibs.utils.Validators;
-import io.github.jdevlibs.utils.Values;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -34,7 +33,6 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -81,6 +79,16 @@ public abstract class JdbcDao implements InitializingBean {
     }
 
     /*++++++++++++++++++ SQL -> List Java Bean ++++++++++++++++++ */
+    /**
+     * Query and auto-convert to the collection of the target class.
+     * @param sql The sql statement
+     * @param clazz The result target class
+     * @return Collection of result target class
+     * @param <T> Generic result class
+     */
+    protected <T> List<T> queryToList(String sql, Class<T> clazz) {
+        return queryToList(sql, new IndexParameter(0), clazz);
+    }
 
     /**
      * Query and auto-convert to the collection of the target class.
@@ -212,7 +220,7 @@ public abstract class JdbcDao implements InitializingBean {
 
     /*++++++++++++++++++ Paging ++++++++++++++++++ */
     /**
-     * Query and auto-convert to Paging result
+     * Query and auto-convert to a Paging result
      * @param sql The sql statement
      * @param criteria Sql criteria
      * @param clazz The result class type
@@ -224,7 +232,7 @@ public abstract class JdbcDao implements InitializingBean {
     }
 
     /**
-     * Query and auto-convert to Paging result
+     * Query and auto-convert to a Paging result
      * @param sql The sql statement
      * @param params The sql statement parameter
      * @see IndexParameter
@@ -239,17 +247,12 @@ public abstract class JdbcDao implements InitializingBean {
 
         Paging<T> paging = new Paging<>();
         Long count = countForPaging(sql, params);
-        paging.setTotalRow(count.intValue());
+        paging.setTotalElements(count);
 
         List<T> items = queryToPaging(sql, params, criteria, clazz);
         paging.setItems(items);
-        if (Validators.isNotNull(criteria.getPage())) {
-            paging.setPageNo(criteria.getPage());
-        }
-        if (Validators.isNotNull(criteria.getSize())) {
-            paging.setPageSize(criteria.getSize());
-        }
-        paging.caculateTotalPage();
+        paging.setCriteria(criteria);
+        paging.calculateTotalPage();
 
         return paging;
     }
@@ -262,7 +265,7 @@ public abstract class JdbcDao implements InitializingBean {
      * @return result paging collection data
      * @param <T> Generic result class
      */
-    protected <T> List<T> queryToPaging(String sql, Criteria criteria, Class<T> clazz) {
+    protected <T> List<T> queryAsPagingResult(String sql, Criteria criteria, Class<T> clazz) {
         return queryToPaging(sql, new IndexParameter(), criteria, clazz);
     }
 
@@ -283,13 +286,7 @@ public abstract class JdbcDao implements InitializingBean {
         StringBuilder pageSql = new StringBuilder();
         pageSql.append("SELECT * FROM (").append(sql);
         pageSql.append(" ) TB");
-        if (criteria.isEmptySort()) {
-            if (Validators.isEmpty(criteria.getOrderByColumn())) {
-                pageSql.append(" ORDER BY 1");
-            } else {
-                pageSql.append(" ORDER BY ").append(criteria.getOrderByColumn());
-            }
-        } else {
+        if (!criteria.isEmptySort()) {
             this.setOrderByOption(pageSql, criteria);
         }
         setPagingOption(pageSql, params, criteria);
@@ -298,7 +295,7 @@ public abstract class JdbcDao implements InitializingBean {
     }
 
     /**
-     * Query count paging collection result
+     * Query counts a paging collection result
      * @param sql The sql statement
      * @param params The sql statement parameter
      * @see IndexParameter
@@ -408,10 +405,10 @@ public abstract class JdbcDao implements InitializingBean {
      * @param stmt java.sql.Statement
      * @param rs java.sql.ResultSet
      */
-    protected void closeResource(Connection conn, Statement stmt, ResultSet rs) {
-        closeResource(rs);
-        closeResource(stmt);
-        closeResource(conn);
+    protected void close(Connection conn, Statement stmt, ResultSet rs) {
+        close(rs);
+        close(stmt);
+        close(conn);
     }
 
     /**
@@ -419,16 +416,16 @@ public abstract class JdbcDao implements InitializingBean {
      * @param stmt java.sql.Statement
      * @param rs java.sql.ResultSet
      */
-    protected void closeResource(Statement stmt, ResultSet rs) {
-        closeResource(rs);
-        closeResource(stmt);
+    protected void close(Statement stmt, ResultSet rs) {
+        close(rs);
+        close(stmt);
     }
 
     /**
      * Close auto closeable resource
      * @param obj The Closeable resource
      */
-    protected void closeResource(AutoCloseable obj) {
+    protected void close(AutoCloseable obj) {
         try {
             if (obj != null) {
                 obj.close();
@@ -530,133 +527,6 @@ public abstract class JdbcDao implements InitializingBean {
         return JdbcUtils.sqlEndLike(value);
     }
 
-    /**
-     * Create dynamic sql WHERE IN statement
-     * @param items The items of value
-     * @return Result sql WHERE IN
-     */
-    public String createNumberWhereIn(Number ... items) {
-        if (Validators.isEmpty(items)) {
-            return Values.EMPTY;
-        }
-
-        StringBuilder sql = new StringBuilder(256);
-        boolean first = true;
-        for (Number obj : items) {
-            if (Validators.isNull(obj)) {
-                continue;
-            }
-
-            if (first) {
-                sql.append(obj);
-                first = false;
-            } else {
-                sql.append(",");
-                sql.append(obj);
-
-            }
-        }
-
-        return sql.toString();
-    }
-
-    /**
-     * Create dynamic sql WHERE IN statement
-     * @param items The items of value
-     * @param params The sql statement parameter
-     * @see IndexParameter
-     * @return Result sql WHERE IN
-     */
-    public String createWhereIn(Collection<?> items, IndexParameter params) {
-        if (Validators.isEmpty(items)) {
-            return Values.EMPTY;
-        }
-
-        StringBuilder sql = new StringBuilder(256);
-        boolean first = true;
-        for (Object obj : items) {
-            if (first) {
-                sql.append("?");
-                first = false;
-            } else {
-                sql.append(", ?");
-            }
-            params.add(obj);
-        }
-
-        return sql.toString();
-    }
-
-    /**
-     * Create dynamic sql WHERE IN statement
-     * @param items The items of value
-     * @param params The sql statement parameter
-     * @see NameParameter
-     * @return Result sql WHERE IN
-     */
-    public String createWhereIn(Collection<?> items, NameParameter params) {
-        return createWhereIn(items, params, "IN");
-    }
-
-    /**
-     * Create dynamic sql WHERE IN statement
-     * @param items The items of value
-     * @param params The sql statement parameter
-     * @see NameParameter
-     * @param prefix Name parameter prefix
-     * @return Result sql WHERE IN
-     */
-    public String createWhereIn(Collection<?> items, NameParameter params, String prefix) {
-        if (Validators.isEmpty(items)) {
-            return Values.EMPTY;
-        }
-        prefix = (Validators.isEmpty(prefix) ? "X" : prefix);
-
-        StringBuilder sql = new StringBuilder(256);
-        int inx = 1;
-        for (Object obj : items) {
-            String paramName = "P_" + prefix + "_PARAM_" + inx;
-            if (inx == 1) {
-                sql.append(":").append(paramName);
-            } else {
-                sql.append(", ").append(":").append(paramName);
-            }
-            params.add(paramName, obj);
-            inx++;
-        }
-
-        return sql.toString();
-    }
-
-    /**
-     * Create dynamic sql WHERE IN statement
-     * @param items The items of value
-     * @param params The sql statement parameter
-     * @see NameParameter
-     * @return Result sql WHERE IN
-     */
-    public String createWhereIn(Object[] items,NameParameter params) {
-        if (Validators.isEmpty(items)) {
-            return Values.EMPTY;
-        }
-
-        StringBuilder sql = new StringBuilder(256);
-        int inx = 1;
-        for (Object obj : items) {
-            String paramName = "P_IN_PARAM_" + inx;
-            if (inx == 1) {
-                sql.append(":").append(paramName);
-            } else {
-                sql.append(", ");
-                sql.append(":").append(paramName);
-            }
-            params.add(paramName, obj);
-            inx++;
-        }
-
-        return sql.toString();
-    }
-
     private Object[] toArrays(Parameter params) {
         if (Validators.isNull(params)) {
             return new Object[] {};
@@ -697,7 +567,7 @@ public abstract class JdbcDao implements InitializingBean {
     }
 
     private void logStatement(String sql, Parameter params, Class<?> clazz) {
-        logger.info("SQL Statement : {}", sql);
+        logger.info("SQL Statement :\n {}", sql);
         if (params != null) {
             if (params instanceof NameParameter) {
                 logger.info("Parameter : {}", params.toMapParameter());

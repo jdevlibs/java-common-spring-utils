@@ -5,7 +5,7 @@
 
     <groupId>io.github.jdevlibs</groupId>
     <artifactId>common-spring-utilities</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <packaging>jar</packaging>
     <name>${project.groupId}:${project.artifactId}</name>
     <description>Common spring framework utilities library.</description>
@@ -52,7 +52,7 @@
         <spring.version>5.3.25</spring.version>
         <jackson-version>2.14.1</jackson-version>
         <slf4j.version>2.0.0</slf4j.version>
-        <common-utilities.version>1.0.1</common-utilities.version>
+        <common-utilities.version>1.0.3</common-utilities.version>
 
         <maven-javadoc-plugin.version>3.4.0</maven-javadoc-plugin.version>
         <maven-source-plugin.version>3.2.0</maven-source-plugin.version>

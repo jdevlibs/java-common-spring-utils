@@ -29,7 +29,6 @@ public class Criteria implements Serializable {
 
     private Integer page;
     private Integer size;
-    private String orderByColumn;
     private Map<String, String> sorts;
 
     public Integer getPage() {
@@ -46,14 +45,6 @@ public class Criteria implements Serializable {
 
     public void setSize(Integer size) {
         this.size = size;
-    }
-
-    public String getOrderByColumn() {
-        return orderByColumn;
-    }
-
-    public void setOrderByColumn(String orderByColumn) {
-        this.orderByColumn = orderByColumn;
     }
 
     public int getMySqlOffset() {
@@ -92,6 +83,10 @@ public class Criteria implements Serializable {
             page = 1;
         }
         return (page - 1) * size;
+    }
+
+    public Integer oracleRowStart() {
+        return getRowStart() + 1;
     }
 
     public boolean isCountQuery() {
