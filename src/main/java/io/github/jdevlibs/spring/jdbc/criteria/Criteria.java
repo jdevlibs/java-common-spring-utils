@@ -30,6 +30,8 @@ public class Criteria implements Serializable {
     private Integer page;
     private Integer size;
     private Map<String, String> sorts;
+    private boolean skipRowCount;
+    private Long totalElement;
 
     public Integer getPage() {
         return page;
@@ -45,6 +47,22 @@ public class Criteria implements Serializable {
 
     public void setSize(Integer size) {
         this.size = size;
+    }
+
+    public boolean isSkipRowCount() {
+        return skipRowCount;
+    }
+
+    public void setSkipRowCount(boolean skipRowCount) {
+        this.skipRowCount = skipRowCount;
+    }
+
+    public Long getTotalElement() {
+        return totalElement;
+    }
+
+    public void setTotalElement(Long totalElement) {
+        this.totalElement = totalElement;
     }
 
     public int getMySqlOffset() {

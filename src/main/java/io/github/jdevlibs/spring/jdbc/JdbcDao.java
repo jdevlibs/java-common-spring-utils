@@ -246,8 +246,13 @@ public abstract class JdbcDao implements InitializingBean {
                                             Criteria criteria, Class<T> clazz) {
 
         Paging<T> paging = new Paging<>();
-        Long count = countForPaging(sql, params);
-        paging.setTotalElements(count);
+        if (!criteria.isSkipRowCount() || criteria.getTotalElement() == null) {
+            Long count = countForPaging(sql, params);
+            paging.setTotalElements(count);
+            criteria.setTotalElement(count);
+        } else {
+            paging.setTotalElements(criteria.getTotalElement());
+        }
 
         List<T> items = queryToPaging(sql, params, criteria, clazz);
         paging.setItems(items);
@@ -287,7 +292,7 @@ public abstract class JdbcDao implements InitializingBean {
         pageSql.append("SELECT * FROM (").append(sql);
         pageSql.append(" ) TB");
         if (!criteria.isEmptySort()) {
-            this.setOrderByOption(pageSql, criteria);
+            setOrderByOption(pageSql, criteria);
         }
         setPagingOption(pageSql, params, criteria);
 
@@ -361,7 +366,12 @@ public abstract class JdbcDao implements InitializingBean {
         }
     }
 
-    private void setOrderByOption(StringBuilder sql, Criteria paging) {
+    /**
+     * Set order by a column or property
+     * @param sql The sql statement
+     * @param paging Sql paging criteria
+     */
+    protected void setOrderByOption(StringBuilder sql, Criteria paging) {
         if (paging.isEmptySort()) {
             return;
         }
