@@ -343,18 +343,20 @@ public abstract class JdbcDao implements InitializingBean {
      * @param paging Sql paging criteria
      */
     public void setOraclePaging(StringBuilder sql, Parameter params, Criteria paging) {
+        String normalSql = sql.toString();
+        sql.setLength(0);
         sql.append("SELECT T.* FROM (");
-        sql.append("SELECT ROWNUM AS ROW_NUM, T.* FROM (");
-        sql.append(sql);
+        sql.append("SELECT ROWNUM AS PAGE_ROW_NUM, T.* FROM (");
+        sql.append(normalSql);
         sql.append(") T");
         sql.append(") T");
         if (params instanceof NameParameter) {
             NameParameter name = (NameParameter) params;
-            sql.append(" WHERE T.ROW_NUM <= :P_ROW_NUM");
-            name.add("P_ROW_NUM", paging.getOracleRowEnd());
+            sql.append(" WHERE T.PAGE_ROW_NUM <= :P_PAGE_ROW_NUM");
+            name.add("P_PAGE_ROW_NUM", paging.getOracleRowEnd());
         } else {
             IndexParameter inx = (IndexParameter) params;
-            sql.append(" WHERE T.ROW_NUM <= ?");
+            sql.append(" WHERE T.P_PAGE_ROW_NUM <= ?");
             inx.add(paging.getOracleRowEnd());
         }
     }
