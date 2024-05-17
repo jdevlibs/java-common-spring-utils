@@ -124,9 +124,9 @@ public final class JsonUtils {
 
     /**
      * Deserialize JSON data format to Object class.
-     * @param <T> The type of class for deserialize.
+     * @param <T> The type of class for deserializing.
      * @param json JSON data format.
-     * @param clazz The class for deserialize.
+     * @param clazz The class for deserializing.
      * @return Object class
      */
     public static <T> T model(String json, Class<T> clazz) {
@@ -141,7 +141,7 @@ public final class JsonUtils {
      * Deserialize JSON data format to Object class.
      * In case need full generic type information
      * </pre>
-     * @param <T> The type of class for deserialize.
+     * @param <T> The type of class for deserializing.
      * @param json JSON data format.
      * @param type JavaType of deserialize.
      * @return Object class
@@ -155,9 +155,9 @@ public final class JsonUtils {
 
     /**
      * Deserialize JSON data format to List of model
-     * @param <T> The type of class for deserialize.
+     * @param <T> The type of class for deserializing.
      * @param json JSON data format must be array.
-     * @param clazz The class for deserialize.
+     * @param clazz The class for deserializing.
      * @return Object class
      */
     public static <T> List<T> models(String json, Class<T> clazz) {
@@ -185,9 +185,9 @@ public final class JsonUtils {
 
     /**
      * Deserialize JSON data format to Object class.
-     * @param <T> The type of class for deserialize.
+     * @param <T> The type of class for deserializing.
      * @param jsonData JSON byte[] data format.
-     * @param clazz The class for deserialize.
+     * @param clazz The class for deserializing.
      * @return Object class
      */
     public static <T> T model(byte[] jsonData, Class<T> clazz) {
@@ -209,7 +209,7 @@ public final class JsonUtils {
      * Deserialize JSON data format to Object class.
      * In case need full generic type information
      * </pre>
-     * @param <T> The type of class for deserialize.
+     * @param <T> The type of class for deserializing.
      * @param jsonData JSON byte[] data format.
      * @param type JavaType of deserialize.
      * @return Object class
@@ -230,9 +230,9 @@ public final class JsonUtils {
 
     /**
      * Deserialize JSON data format to List of model.
-     * @param <T> The type of class for deserialize.
+     * @param <T> The type of class for deserializing.
      * @param jsonData JSON byte[] data format.
-     * @param clazz The class for deserialize.
+     * @param clazz The class for deserializing.
      * @return Object class
      */
     public static <T> List<T> models(byte[] jsonData, Class<T> clazz) {
@@ -362,7 +362,7 @@ public final class JsonUtils {
 
     private static SimpleModule createEnumModule() {
         SimpleModule module = new SimpleModule();
-        module.addSerializer(String.class, new StdSerializer<String>(String.class) {
+        module.addSerializer(String.class, new StdSerializer<>(String.class) {
             private static final long serialVersionUID = 1L;
 
             @Override
@@ -379,7 +379,7 @@ public final class JsonUtils {
             }
         });
 
-        module.addSerializer(Enum.class, new StdSerializer<Enum>(Enum.class) {
+        module.addSerializer(Enum.class, new StdSerializer<>(Enum.class) {
             private static final long serialVersionUID = 1L;
 
             @Override
