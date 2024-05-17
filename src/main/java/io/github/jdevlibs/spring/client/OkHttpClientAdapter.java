@@ -64,6 +64,10 @@ public abstract class OkHttpClientAdapter implements InitializingBean {
 
     protected abstract void autowiredHttpClient(OkHttpClient httpClient);
 
+    public final void setHttpClient(OkHttpClient httpClient) {
+        this.httpClient = httpClient;
+    }
+
     public OkHttpClient getHttpClient() {
         return httpClient;
     }
