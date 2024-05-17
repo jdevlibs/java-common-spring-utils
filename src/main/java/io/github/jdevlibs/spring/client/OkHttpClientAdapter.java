@@ -572,7 +572,11 @@ public abstract class OkHttpClientAdapter implements InitializingBean {
         try {
             String json = null;
             if (req != null && req.getModel() != null) {
-                json = JsonUtils.json(req.getModel());
+                if (req.isJsonString()) {
+                    json = req.getModel().toString();
+                } else {
+                    json = JsonUtils.json(req.getModel());
+                }
             }
             logInfo(url, json);
 
