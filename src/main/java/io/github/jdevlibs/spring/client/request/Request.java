@@ -17,8 +17,7 @@
  */
 package io.github.jdevlibs.spring.client.request;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -28,9 +27,9 @@ import java.util.Map;
  * @author supot.jdev
  * @version 1.0
  */
-
-@EqualsAndHashCode(of = {"id"})
-@Data
+@Getter
+@Setter
+@ToString
 public class Request implements Serializable {
     private String id;
     private Map<String, String> headers;

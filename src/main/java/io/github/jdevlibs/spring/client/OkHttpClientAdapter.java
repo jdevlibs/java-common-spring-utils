@@ -17,6 +17,7 @@
  */
 package io.github.jdevlibs.spring.client;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import io.github.jdevlibs.spring.client.request.*;
 import io.github.jdevlibs.spring.exception.ClientApiException;
 import io.github.jdevlibs.spring.utils.JsonUtils;
@@ -68,6 +69,7 @@ public abstract class OkHttpClientAdapter implements InitializingBean {
         this.httpClient = httpClient;
     }
 
+    /* ++++++++++++++++++++++++++ OkHttpClient +++++++++++++++++++++++ */
     public OkHttpClient getHttpClient() {
         return httpClient;
     }
@@ -105,7 +107,7 @@ public abstract class OkHttpClientAdapter implements InitializingBean {
     }
 
     /**
-     *  Call service API with POST by json body
+     *  Call service API with POST by JSON body
      * @param url Service API URL
      */
     public void post(String url) {
@@ -113,18 +115,18 @@ public abstract class OkHttpClientAdapter implements InitializingBean {
     }
 
     /**
-     *  Call service API with POST by json body
+     *  Call service API with POST by JSON body
      * @param url Service API URL
-     * @param jsonRequest The request json model
+     * @param jsonRequest The request JSON model
      */
     public void post(String url, JsonRequest<?> jsonRequest) {
         post(url, jsonRequest, null);
     }
 
     /**
-     * Call service API with POST by json body
+     * Call service API with POST by JSON body
      * @param url Service API URL
-     * @param request The request json model
+     * @param request The request JSON model
      * @param clazz The response model class
      * @return The result of assign class
      * @param <T> Generic class
@@ -145,7 +147,30 @@ public abstract class OkHttpClientAdapter implements InitializingBean {
     }
 
     /**
-     *  Call service API with PUT by json body
+     * Call service API with post by JSON body
+     * @param url Service API URL
+     * @param request The request model
+     * @param type JSON TypeReference
+     * @return The result of assign class
+     * @param <T> The type of response class
+     */
+    public <T> T postAsRefType(String url, JsonRequest<?> request, TypeReference<T> type) {
+        try {
+            byte[] contents = jsonAsByte(url, request, HttpMethod.POST);
+            if (Validators.isEmpty(contents) || type == null) {
+                return null;
+            }
+
+            return JsonUtils.model(contents, type);
+        } catch (ClientApiException ex) {
+            throw ex;
+        } catch (Exception ex) {
+            throw throwException(ex);
+        }
+    }
+
+    /**
+     *  Call service API with PUT by JSON body
      * @param url Service API URL
      */
     public void put(String url) {
@@ -153,25 +178,25 @@ public abstract class OkHttpClientAdapter implements InitializingBean {
     }
 
     /**
-     *  Call service API with PUT by json body
+     *  Call service API with PUT by JSON body
      * @param url Service API URL
-     * @param jsonRequest The request json model
+     * @param request The request JSON model
      */
-    public void put(String url, JsonRequest<?> jsonRequest) {
-        put(url, jsonRequest, null);
+    public void put(String url, JsonRequest<?> request) {
+        put(url, request, null);
     }
 
     /**
-     * Call service API with POST by json body
+     * Call service API with POST by JSON body
      * @param url Service API URL
-     * @param jsonRequest The request json model
+     * @param request The request JSON model
      * @param clazz The response model class
      * @return The result of assign class
      * @param <T> Generic class
      */
-    public <T> T put(String url, JsonRequest<?> jsonRequest, Class<T> clazz) {
+    public <T> T put(String url, JsonRequest<?> request, Class<T> clazz) {
         try {
-            byte[] contents = jsonAsByte(url, jsonRequest, HttpMethod.PUT);
+            byte[] contents = jsonAsByte(url, request, HttpMethod.PUT);
             if (Validators.isEmpty(contents) || clazz == null) {
                 return null;
             }
@@ -185,16 +210,39 @@ public abstract class OkHttpClientAdapter implements InitializingBean {
     }
 
     /**
-     * Call service API with POST by json body return result as collections.
+     * Call service API with POST by JSON body
      * @param url Service API URL
-     * @param jsonRequest The request json model
+     * @param request The request JSON model
+     * @param type The JSON TypeReference
+     * @return The result of assign class
+     * @param <T> Generic class
+     */
+    public <T> T putJsonAsRefType(String url, JsonRequest<?> request, TypeReference<T> type) {
+        try {
+            byte[] contents = jsonAsByte(url, request, HttpMethod.PUT);
+            if (Validators.isEmpty(contents) || type == null) {
+                return null;
+            }
+
+            return JsonUtils.model(contents, type);
+        } catch (ClientApiException ex) {
+            throw ex;
+        } catch (Exception ex) {
+            throw throwException(ex);
+        }
+    }
+
+    /**
+     * Call service API with POST by JSON body return result as collections.
+     * @param url Service API URL
+     * @param request The request JSON model
      * @param clazz The response model class
      * @return The result of assign class
      * @param <T> The type of response class
      */
-    public <T> List<T> postResultAsList(String url, JsonRequest<?> jsonRequest, Class<T> clazz) {
+    public <T> List<T> postResultAsList(String url, JsonRequest<?> request, Class<T> clazz) {
         try {
-            byte[] contents = jsonAsByte(url, jsonRequest, HttpMethod.POST);
+            byte[] contents = jsonAsByte(url, request, HttpMethod.POST);
             if (Validators.isEmpty(contents) || clazz == null) {
                 return Collections.emptyList();
             }
@@ -207,16 +255,16 @@ public abstract class OkHttpClientAdapter implements InitializingBean {
     }
 
     /**
-     * Call service API with PUT by json body return result as collections.
+     * Call service API with PUT by JSON body return result as collections.
      * @param url Service API URL
-     * @param jsonRequest The request json model
+     * @param request The request JSON model
      * @param clazz The response model class
      * @return The result of assign class
      * @param <T> The type of response class
      */
-    public <T> List<T> putResultAsList(String url, JsonRequest<?> jsonRequest, Class<T> clazz) {
+    public <T> List<T> putResultAsList(String url, JsonRequest<?> request, Class<T> clazz) {
         try {
-            byte[] contents = jsonAsByte(url, jsonRequest, HttpMethod.PUT);
+            byte[] contents = jsonAsByte(url, request, HttpMethod.PUT);
             if (Validators.isEmpty(contents) || clazz == null) {
                 return Collections.emptyList();
             }
@@ -239,10 +287,10 @@ public abstract class OkHttpClientAdapter implements InitializingBean {
     /**
      * Call service API with POST by form
      * @param url Service API URL
-     * @param req The Form request object includes [fields, headers]
+     * @param request The Form request object includes [fields, headers]
      */
-    public void postForm(String url, FormRequest req) {
-        postForm(url, req, null);
+    public void postForm(String url, FormRequest request) {
+        postForm(url, request, null);
     }
 
     /**
@@ -259,19 +307,42 @@ public abstract class OkHttpClientAdapter implements InitializingBean {
     /**
      * Call service API with POST by form
      * @param url   Service API URL
-     * @param req   The Form request object includes [fields, headers]
+     * @param request   The Form request object includes [fields, headers]
      * @param clazz The response model class
      * @return The result of assign class
      * @param <T>   The type of response class
      */
-    public <T> T postForm(String url, FormRequest req, Class<T> clazz) {
+    public <T> T postForm(String url, FormRequest request, Class<T> clazz) {
         try {
-            byte[] contents = postFormAsByte(url, req);
+            byte[] contents = postFormAsByte(url, request);
             if (Validators.isEmpty(contents) || clazz == null) {
                 return null;
             }
 
             return JsonUtils.model(contents, clazz);
+        } catch (ClientApiException ex) {
+            throw ex;
+        } catch (Exception ex) {
+            throw throwException(ex);
+        }
+    }
+
+    /**
+     * Call service API with POST by form
+     * @param url   Service API URL
+     * @param request   The Form request object includes [fields, headers]
+     * @param type The response model class
+     * @return The result of assign class
+     * @param <T>   The type of response class
+     */
+    public <T> T postFormAsRefType(String url, FormRequest request, TypeReference<T> type) {
+        try {
+            byte[] contents = postFormAsByte(url, request);
+            if (Validators.isEmpty(contents) || type == null) {
+                return null;
+            }
+
+            return JsonUtils.model(contents, type);
         } catch (ClientApiException ex) {
             throw ex;
         } catch (Exception ex) {
@@ -372,6 +443,38 @@ public abstract class OkHttpClientAdapter implements InitializingBean {
     }
 
     /**
+     * Call service API with POST by MultiPart (file upload)
+     * @param url   Service API URL
+     * @param req   The Form request object includes [fields, headers, files]
+     * @param type The response model class
+     * @return The result of assign class
+     * @param <T>   The type of response class
+     */
+    public <T> T postMultiPartAsRefType(String url, MultipartRequest req, TypeReference<T> type) {
+        try {
+            logInfo(url, req);
+            if (Validators.isNullOne(url, req, type)) {
+                throw new ClientApiException(ClientApiException.ClientApiErrorCodes.CODE_API_ERROR, "Invalid required parameter");
+            }
+
+            RequestBody body = multipartRequestBody(req);
+            Request request = formMultipart(url, body, req);
+            Call call = httpClient.newCall(request);
+            try (Response resp = call.execute()) {
+                if (resp.isSuccessful() && resp.body() != null) {
+                    return JsonUtils.model(resp.body().bytes(), type);
+                } else {
+                    throw throwException(resp);
+                }
+            }
+        } catch (ClientApiException ex) {
+            throw ex;
+        } catch (Exception ex) {
+            throw throwException(ex);
+        }
+    }
+
+    /**
      * Call service API with http (GET) method
      * @param url   Service API URL
      * @param clazz The response model class
@@ -385,19 +488,42 @@ public abstract class OkHttpClientAdapter implements InitializingBean {
     /**
      * Call service API with http (GET) method
      * @param url   Service API URL
-     * @param getRequest   The Form request object includes [Parameters, headers]
+     * @param request   The Form request object includes [Parameters, headers]
      * @param clazz The response model class
      * @return The result of assign class
      * @param <T>   The type of response class
      */
-    public <T> T get(String url, GetRequest getRequest, Class<T> clazz) {
+    public <T> T get(String url, GetRequest request, Class<T> clazz) {
         try {
-            byte[] contents = getAsByte(url, getRequest);
+            byte[] contents = getAsByte(url, request);
             if (Validators.isEmpty(contents) || clazz == null) {
                 return null;
             }
 
             return JsonUtils.model(contents, clazz);
+        } catch (ClientApiException ex) {
+            throw ex;
+        } catch (Exception ex) {
+            throw throwException(ex);
+        }
+    }
+
+    /**
+     * Call service API with http (GET) method
+     * @param url   Service API URL
+     * @param request   The Form request object includes [Parameters, headers]
+     * @param type The response model class
+     * @return The result of assign class
+     * @param <T>   The type of response class
+     */
+    public <T> T get(String url, GetRequest request, TypeReference<T> type) {
+        try {
+            byte[] contents = getAsByte(url, request);
+            if (Validators.isEmpty(contents) || type == null) {
+                return null;
+            }
+
+            return JsonUtils.model(contents, type);
         } catch (ClientApiException ex) {
             throw ex;
         } catch (Exception ex) {
@@ -494,6 +620,29 @@ public abstract class OkHttpClientAdapter implements InitializingBean {
      *  Call service API with [http:DELETE]
      * @param url Service API URL
      * @param deleteRequest The request object includes [parameter, headers]
+     * @param type The response model class
+     * @return The result of assign class
+     * @param <T> The type of response class
+     */
+    public <T> T deleteAsTypeReference(String url, DeleteRequest deleteRequest, TypeReference<T> type) {
+        try {
+            byte[] contents = deleteAsByte(url, deleteRequest);
+            if (Validators.isEmpty(contents) || type == null) {
+                return null;
+            }
+
+            return JsonUtils.model(contents, type);
+        } catch (ClientApiException ex) {
+            throw ex;
+        } catch (Exception ex) {
+            throw throwException(ex);
+        }
+    }
+
+    /**
+     *  Call service API with [http:DELETE]
+     * @param url Service API URL
+     * @param deleteRequest The request object includes [parameter, headers]
      * @param clazz The response model class
      * @return The result of assign class
      * @param <T> The type of response class
@@ -514,7 +663,7 @@ public abstract class OkHttpClientAdapter implements InitializingBean {
     }
 
     /**
-     * Call service API with [http:DELETE] by json body
+     * Call service API with [http:DELETE] by JSON body
      * @param url Service API URL
      * @param jsonRequest The request model
      */
@@ -523,7 +672,7 @@ public abstract class OkHttpClientAdapter implements InitializingBean {
     }
 
     /**
-     * Call service API with [http:DELETE] by json body
+     * Call service API with [http:DELETE] by JSON body
      * @param url   Service API URL
      * @param jsonRequest   The request model
      * @param clazz The response model class
@@ -546,7 +695,30 @@ public abstract class OkHttpClientAdapter implements InitializingBean {
     }
 
     /**
-     * Call service API with [http:DELETE] by json body result as a collection.
+     * Call service API with [http:DELETE] by JSON body
+     * @param url   Service API URL
+     * @param jsonRequest   The request model
+     * @param type The response model class
+     * @return The result of assign class
+     * @param <T>   The type of response class
+     */
+    public <T> T deleteAsTypeReference(String url, JsonRequest<?> jsonRequest, TypeReference<T> type) {
+        try {
+            byte[] contents = jsonAsByte(url, jsonRequest, HttpMethod.DELETE);
+            if (Validators.isEmpty(contents) || type == null) {
+                return null;
+            }
+
+            return JsonUtils.model(contents, type);
+        } catch (ClientApiException ex) {
+            throw ex;
+        } catch (Exception ex) {
+            throw throwException(ex);
+        }
+    }
+
+    /**
+     * Call service API with [http:DELETE] by JSON body result as a collection.
      * @param url   Service API URL
      * @param jsonRequest   The request model
      * @param clazz The response model class

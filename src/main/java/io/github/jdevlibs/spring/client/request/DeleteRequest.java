@@ -17,9 +17,7 @@
  */
 package io.github.jdevlibs.spring.client.request;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import lombok.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -28,9 +26,9 @@ import java.util.Map;
  * @author supot.jdev
  * @version 1.0
  */
-@Data
+@Setter
+@Getter
 @ToString(callSuper = true)
-@EqualsAndHashCode(callSuper = true)
 public class DeleteRequest extends Request {
     private Map<String, String> parameters;
 

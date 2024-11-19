@@ -19,16 +19,11 @@
 package io.github.jdevlibs.spring.utils;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
-import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.json.JsonWriteFeature;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.MapperFeature;
-import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.json.JsonMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import com.fasterxml.jackson.databind.type.CollectionType;
 import com.fasterxml.jackson.databind.type.MapType;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -47,49 +42,27 @@ import java.util.*;
  */
 public final class JsonUtils {
     private static final JsonMapper mapper;
-    private static final JsonMapper mapperJs;
     private static final Logger logger = LoggerFactory.getLogger(JsonUtils.class);
 
     private JsonUtils() {}
 
     static {
         mapper = JsonMapper.builder().build();
-        mapperJs = JsonMapper.builder()
-                .enable(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS).build();
-        mapperConfig(mapper, false);
-        mapperConfig(mapperJs, true);
+        mapperConfig();
     }
 
-    /**
-     * Serialize object value to JSON with JavaScript data format
-     * @param obj The object to serialize.
-     * @return Serialize value as string
-     */
-    public static String jsonToJs(Object obj) {
-        return jsonToJs(obj, false);
-    }
+    private static void mapperConfig() {
+        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        mapper.setDateFormat(new SimpleDateFormat(ConfigProperties.getJsonDateFormat()));
+        mapper.registerModule(new JavaTimeModule());
 
-    /**
-     * Serialize object value to JSON with JavaScript data format
-     * @param obj The object to convert.
-     * @param prettyOutput Write out pretty readable.
-     * @return Serialize value as string
-     */
-    public static String jsonToJs(Object obj, boolean prettyOutput) {
-        String jsonData = null;
-        try {
-            if (prettyOutput) {
-                jsonData = mapperJs.writerWithDefaultPrettyPrinter().
-                        withoutFeatures(JsonWriteFeature.QUOTE_FIELD_NAMES).writeValueAsString(obj);
-            } else {
-                jsonData = mapperJs.writer()
-                        .withoutFeatures(JsonWriteFeature.QUOTE_FIELD_NAMES).writeValueAsString(obj);
-            }
-        } catch (JsonProcessingException ex) {
-            logger.error("jsonToJs", ex);
-        }
-
-        return jsonData;
+        // Only serialization class attributes or member ignore all get/set and isMethod.
+        mapper.setVisibility(mapper.getVisibilityChecker()
+                .withFieldVisibility(Visibility.ANY)
+                .withGetterVisibility(Visibility.NONE)
+                .withSetterVisibility(Visibility.NONE)
+                .withCreatorVisibility(Visibility.NONE)
+                .withIsGetterVisibility(Visibility.NONE));
     }
 
     /**
@@ -154,9 +127,44 @@ public final class JsonUtils {
     }
 
     /**
-     * Deserialize JSON data format to List of model
+     * Deserialize JSON data format to Object class.
+     * @param json JSON String data format.
+     * @param type TypeReference<T> type
+     * @return Object class
+     * @param <T> Generic type
+     */
+    public static <T> T model(String json, TypeReference<T> type) {
+        if (Validators.isEmptyOne(json, type)) {
+            return null;
+        }
+        return model(json.getBytes(), type);
+    }
+
+    /**
+     * Deserialize JSON data format to Object class.
+     * @param jsonData JSON byte[] data format.
+     * @param type TypeReference<T> type
+     * @return Object class
+     * @param <T> Generic type
+     */
+    public static <T> T model(byte[] jsonData, TypeReference<T> type) {
+        try {
+            if (Validators.isEmpty(jsonData)) {
+                return null;
+            }
+
+            return mapper.readValue(jsonData, type);
+        } catch (IOException ex) {
+            logger.error("model", ex);
+        }
+
+        return null;
+    }
+
+    /**
+     * Deserialize JSON data format to List of a model
      * @param <T> The type of class for deserializing.
-     * @param json JSON data format must be array.
+     * @param json JSON data format must be arrayed.
      * @param clazz The class for deserializing.
      * @return Object class
      */
@@ -229,7 +237,7 @@ public final class JsonUtils {
     }
 
     /**
-     * Deserialize JSON data format to List of model.
+     * Deserialize JSON data format to List of a model.
      * @param <T> The type of class for deserializing.
      * @param jsonData JSON byte[] data format.
      * @param clazz The class for deserializing.
@@ -340,57 +348,5 @@ public final class JsonUtils {
     public static JavaType mapType(Class<? extends Map> mapClass,
                                    Class<?> keyClass, Class<?> valueClass) {
         return mapper.getTypeFactory().constructMapType(mapClass, keyClass, valueClass);
-    }
-
-    private static void mapperConfig(JsonMapper mapper, boolean jsMode) {
-        mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        mapper.setDateFormat(new SimpleDateFormat(ConfigProperties.getJsonDateFormat()));
-        mapper.registerModule(new JavaTimeModule());
-        if (jsMode) {
-            mapper.registerModule(createEnumModule());
-        }
-
-        // Only serialization class attributes or member
-        // ignore all get/set and isMethod.
-        mapper.setVisibility(mapper.getVisibilityChecker()
-                .withFieldVisibility(Visibility.ANY)
-                .withGetterVisibility(Visibility.NONE)
-                .withSetterVisibility(Visibility.NONE)
-                .withCreatorVisibility(Visibility.NONE)
-                .withIsGetterVisibility(Visibility.NONE));
-    }
-
-    private static SimpleModule createEnumModule() {
-        SimpleModule module = new SimpleModule();
-        module.addSerializer(String.class, new StdSerializer<>(String.class) {
-            private static final long serialVersionUID = 1L;
-
-            @Override
-            public void serialize(String value, JsonGenerator jsonGenerator, SerializerProvider provider) throws IOException {
-                if (value == null || value.isEmpty()) {
-                    return;
-                }
-                if (value.contains("function") || value.contains("(function")) {
-                    jsonGenerator.writeRawValue(value);
-                } else {
-                    jsonGenerator.writeString(value);
-                }
-
-            }
-        });
-
-        module.addSerializer(Enum.class, new StdSerializer<>(Enum.class) {
-            private static final long serialVersionUID = 1L;
-
-            @Override
-            public void serialize(Enum value, JsonGenerator jsonGenerator, SerializerProvider provider) throws IOException {
-                if (value == null) {
-                    return;
-                }
-                jsonGenerator.writeString(value.name().toLowerCase());
-            }
-        });
-
-        return module;
     }
 }

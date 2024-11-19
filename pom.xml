@@ -5,7 +5,7 @@
 
     <groupId>io.github.jdevlibs</groupId>
     <artifactId>common-spring-utilities</artifactId>
-    <version>1.0.6</version>
+    <version>2024.11.01</version>
     <packaging>jar</packaging>
     <name>${project.groupId}:${project.artifactId}</name>
     <description>Common spring framework utilities library.</description>
@@ -44,17 +44,18 @@
     </developers>
 
     <properties>
-        <java.version>11</java.version>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
+        <java.version>17</java.version>
+        <maven.compiler.source>17</maven.compiler.source>
+        <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
-        <spring.version>5.3.25</spring.version>
+        <spring.version>6.1.14</spring.version>
         <jackson-version>2.14.1</jackson-version>
         <slf4j.version>2.0.0</slf4j.version>
         <okhttp.version>4.10.0</okhttp.version>
         <lombok.version>1.18.24</lombok.version>
-        <common-utilities.version>1.0.7</common-utilities.version>
+        <common-utilities.version>1.0.12</common-utilities.version>
+        <jakarta.servlet-api.version>6.0.0</jakarta.servlet-api.version>
 
         <maven-javadoc-plugin.version>3.4.0</maven-javadoc-plugin.version>
         <maven-source-plugin.version>3.2.0</maven-source-plugin.version>
@@ -78,6 +79,18 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-context</artifactId>
+            <version>${spring.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-web</artifactId>
+            <version>${spring.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webmvc</artifactId>
             <version>${spring.version}</version>
             <scope>provided</scope>
         </dependency>
@@ -123,6 +136,13 @@
             <version>${lombok.version}</version>
             <scope>provided</scope>
             <optional>true</optional>
+        </dependency>
+
+        <dependency>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+            <version>${jakarta.servlet-api.version}</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>

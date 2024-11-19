@@ -1,8 +1,6 @@
 package io.github.jdevlibs.spring.client.request;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import lombok.*;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -12,9 +10,9 @@ import java.util.Map;
  * @author supot.jdev
  * @version 1.0
  */
-@Data
+@Setter
+@Getter
 @ToString(callSuper = true)
-@EqualsAndHashCode(callSuper = true)
 public class MultipartRequest extends FormRequest {
     private Map<String, FilePart> files;
 
@@ -34,7 +32,8 @@ public class MultipartRequest extends FormRequest {
         files = null;
     }
 
-    @Data
+    @Setter
+    @Getter
     @ToString(of = {"name", "path"})
     public static class FilePart implements Serializable {
 

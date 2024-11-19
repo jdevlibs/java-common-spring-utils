@@ -1,16 +1,14 @@
 package io.github.jdevlibs.spring.client.request;
 
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
+import lombok.*;
 
 /**
  * @author supot.jdev
  * @version 1.0
  */
-@Data
+@Setter
+@Getter
 @ToString(callSuper = true)
-@EqualsAndHashCode(callSuper = true)
 public class JsonRequest<T> extends Request {
     private T model;
 
