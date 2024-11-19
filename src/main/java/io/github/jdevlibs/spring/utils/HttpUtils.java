@@ -169,6 +169,9 @@ public final class HttpUtils {
         if (Validators.isNull(request)) {
             return Collections.emptyList();
         }
+        if (Validators.isEmpty(request.getCookies())) {
+            return Collections.emptyList();
+        }
         return Arrays.stream(request.getCookies()).toList();
     }
 
@@ -197,6 +200,10 @@ public final class HttpUtils {
         if (Validators.isNullOne(request, name)) {
             return null;
         }
+        if (Validators.isEmpty(request.getCookies())) {
+            return null;
+        }
+
         return Arrays.stream(request.getCookies())
                 .filter(c -> name.equals(c.getName()))
                 .findAny().orElse(null);
@@ -226,7 +233,10 @@ public final class HttpUtils {
         if (Validators.isNullOne(request, name)) {
             return null;
         }
-
+        if (Validators.isEmpty(request.getCookies())) {
+            return null;
+        }
+        
         return Arrays.stream(request.getCookies())
                 .filter(c -> name.equals(c.getName()))
                 .map(Cookie::getValue)
