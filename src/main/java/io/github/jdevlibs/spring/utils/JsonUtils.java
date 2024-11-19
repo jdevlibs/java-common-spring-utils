@@ -114,7 +114,6 @@ public final class JsonUtils {
      * Deserialize JSON data format to Object class.
      * In case need full generic type information
      * </pre>
-     * @param <T> The type of class for deserializing.
      * @param json JSON data format.
      * @param type JavaType of deserialize.
      * @return Object class
@@ -129,7 +128,7 @@ public final class JsonUtils {
     /**
      * Deserialize JSON data format to Object class.
      * @param json JSON String data format.
-     * @param type TypeReference<T> type
+     * @param type TypeReference type
      * @return Object class
      * @param <T> Generic type
      */
@@ -143,7 +142,7 @@ public final class JsonUtils {
     /**
      * Deserialize JSON data format to Object class.
      * @param jsonData JSON byte[] data format.
-     * @param type TypeReference<T> type
+     * @param type TypeReference type
      * @return Object class
      * @param <T> Generic type
      */
@@ -163,7 +162,6 @@ public final class JsonUtils {
 
     /**
      * Deserialize JSON data format to List of a model
-     * @param <T> The type of class for deserializing.
      * @param json JSON data format must be arrayed.
      * @param clazz The class for deserializing.
      * @return Object class

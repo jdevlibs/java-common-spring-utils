@@ -174,6 +174,9 @@ public class ClientApiException extends RuntimeException {
         return isApiTimeout() || isUnknownHost();
     }
 
+    /**
+     * OKHttp error code
+     */
     public enum ClientApiErrorCodes {
 
         CODE_API_ERROR("500", "Internal Server Error"),
